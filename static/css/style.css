@@ -1,0 +1,122 @@
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    outline: 0;
+}
+
+* {
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+span {
+    max-width: 50px;
+}
+
+input[type='radio'] {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 5px;
+}
+
+input[type='number'] {
+    padding: 0.5rem 0 0.5rem 2px;
+}
+
+input[type='text'] {
+    padding: 0.5rem 1rem;
+}
+
+button {
+    padding: 0.5rem 1rem;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none !important;
+}
+
+body {
+    justify-content: center;
+    align-items: center;
+}
+
+#root {
+    width: 500px;
+    justify-content: center;
+}
+
+.mode-selector-wrapper {
+    padding: 1rem 2rem;
+}
+
+.mode-selector {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    align-items: center;
+    justify-content: start;
+}
+
+.mode-one-selector-wrapper {
+    padding: 1rem 2rem;
+}
+
+.mode-one-selector {
+    padding: 0.5rem 1rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.mode-one-input-number {
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mode-one-input-number input {
+    width: 3rem;
+}
+
+.mode-one-input-number input:not(last-child) {
+    margin-right: 0.5rem;
+}
+
+.mode-two-selector-wrapper {
+    padding: 1rem 2rem;
+}
+
+.mode-two-selector {
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mode-two-sub-selectors {
+    padding: 0.5rem 1rem;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mode-two-sub {
+    align-items: center;
+    justify-content: center;
+}
+
+.mode-two-sub:not(:last-child) {
+    margin-right: 1rem;
+}
+
+.mode-two-input {
+    flex: 1;
+    margin: 0.5rem 1rem;
+}

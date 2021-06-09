@@ -1,0 +1,181 @@
+{% load static %}
+<html>
+	<head>
+		<link href=" {% static 'css/style.css' %} " rel="stylesheet">
+	</head>
+	<body>
+		<h1>{{ logo }}</h1>
+	    <div id="root" class="flex-column">
+	        <div id="selector" class="mode-selector-wrapper flex">
+	            <div class="mode-selector flex">
+	                <span>Cache</span>
+	                <input type="radio" name="modeSelector" id="cacheMode" onselect="selectMode();" order=1>
+	            </div>
+	            <div class="mode-selector flex">
+	                <span>Online</span>
+	                <input type="radio" name="modeSelector" id="onlineMode" onselect="selectMode();" order=2>
+	            </div>
+	            <div class="mode-selector flex">
+	                <span>Local</span>
+	                <input type="radio" name="modeSelector" id="localMode" onselect="selectMode();" order=3>
+	            </div>
+	        </div>
+	        <div id="modeOne" class="mode-one-selector-wrapper flex">
+	            <div class="mode-one-selector flex">
+	                <span>All</span>
+	                <input type="radio" name="modeOne" id="modeAll"  onselect="selectCacheMode();" order=1>
+	            </div>
+	            <div class="mode-one-selector flex">
+	                <span>ID</span>
+	                <input type="radio" name="modeOne" id="modeId" onselect="selectCacheMode();" order=2>
+	                <div id="idInput" class="mode-one-input-number flex">
+	                    <input type="number" name="test" min=0 oninput="validity.valid||(value='');">
+	                </div>
+	            </div>
+	            <div class="mode-one-selector flex">
+	                <span>N ~ M</span>
+	                <input type="radio" name="modeOne" id="modeNdashM" onselect="selectCacheMode();" order=3>
+	                <div id="ndashMInput" class="mode-one-input-number flex">
+	                    <input type="number" name="test" min=0 oninput="validity.valid||(value='');"> ~ <input type="number" name="test" min=0 oninput="validity.valid||(value='');">
+	                </div>
+	            </div>
+	        </div>
+	        <div id="modeTwo" class="mode-two-selector-wrapper flex-column">
+	            <div class="mode-two-selector flex">
+	                <div class="mode-two-sub-selectors flex">
+	                    <div class="mode-two-sub flex">
+	                        <span>Single</span>
+	                        <input type="radio" name="listModeSelector" id="listModeSelector">
+	                    </div>
+	                    <div class="mode-two-sub flex">
+	                        <span>List</span>
+	                        <input type="radio" name="listModeSelector" id="listModeSelector">
+	                    </div>
+	                </div>
+	                <div class="mode-two-sub-selectors flex">
+	                    <div class="mode-two-sub flex">
+	                        <span>IP</span>
+	                        <input type="radio" name="ipModeSelector" id="ipModeSelector">
+	                    </div>
+	                    <div class="mode-two-sub flex">
+	                        <span>Domain</span>
+	                        <input type="radio" name="ipModeSelector" id="ipModeSelector">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="mode-two-selector flex">
+	                <input type="text" class="form-input" id="ipv4" name="ipv4" placeholder="xxx.xxx.xxx.xxx"/>
+	            </div>
+	        </div>
+	        <div style="display: flex; justify-content: center; width: 100%;">
+	            <button onclick="RTCData()">Start</button>
+	        </div>
+	    </div>
+
+		{% if args.list %}
+			{% for f in threat_feeds_db %}
+
+  				<div>{{f.feed_id}}, {{f.feed_name}}, {{f.feed_url}}</div>
+
+			{% endfor %}
+		{% endif %}
+
+		<div id="fetch_feed_content">
+			
+		</div>
+
+	</body>
+	{% csrf_token %}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://rawgit.com/RobinHerbots/jquery.inputmask/3.x/dist/jquery.inputmask.bundle.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		var ipv4_address = $('#ipv4');
+		ipv4_address.inputmask({
+		    alias: "ip",
+		    greedy: false //The initial mask shown will be "" instead of "-____".
+		});
+
+		const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+		var feed_ids = {{ feed_ids }};
+		var index = 0;
+		var mode = 1;
+		var cacheIds = 0;
+		var cacheSingleID = 0;
+		var cacheStartID = 0;
+		var cacheEndID = 0;
+
+		function selectMode() {
+			switch($(this).attr('order')) {
+				case 1:
+					mode = 1;
+					$('#modeOne').show();
+					$('#modeTwo').hide();
+					break;
+				case 2:
+					mode = 2;
+					$('#modeOne').hide();
+					$('#modeTwo').show();
+					break;
+				case 3:
+					mode = 3;
+					$('#modeOne').hide();
+					$('#modeTwo').show();
+					break;
+				default:
+					mode = 1;
+					$('#modeOne').show();
+					$('#modeTwo').hide();
+					break;
+			}
+		}
+
+		function selectCacheMode() {
+			switch($(this).attr('order')) {
+				case 1:
+					cacheIds = 0;
+					break;
+				case 2:
+					cacheIds = 1;
+					break;
+				case 3:
+					cacheIds = 2;
+					break;
+				default:
+					cacheIds = 0;
+					break;
+			}
+		}
+
+		function RTCData () {
+
+			$('#fetch_feed_content').append('<div>' + "Fetching threat from feed " + feed_ids[index] +'</div>');
+			$.ajax({
+	    		url: 'getRTCData',
+	    		headers: {'X-CSRFToken': csrf_token},
+	    		mode: 'same-origin',
+			    type: 'POST',
+			    data: { "index" : feed_ids[index] },
+			    dataType : "json",
+			    // async: false,
+			    success: function(data) {
+			    	
+			    	// console.log('success = ', data)
+			    	
+			    	if (data.ajaxForRerender.length == 0) $('#fetch_feed_content').append('<div style="color:red">' + "feed请求失败"+'</div>');
+
+			    	$('#fetch_feed_content').append('<div>' + data.ajaxForRerender +'</div>');
+			    	
+			    	index ++;
+			    	
+			    	RTCData ();
+			        
+			    },
+			    failure: function(data) { 
+			    	console("failure");
+			    }
+			}); 
+		}
+
+		// setInterval(function(){ RTCData() }, 2000); 
+	</script>
+</html>
